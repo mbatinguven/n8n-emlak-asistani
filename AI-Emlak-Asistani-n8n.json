@@ -1,0 +1,201 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a3b573fc-1b7e-47ab-8654-be81a923ebfb",
+      "name": "Deneme_Test",
+      "webhookId": "be02d29c-479e-404f-9b40-e402826427bd",
+      "credentials": {
+        "telegramApi": {
+          "id": "OGbQCKJy1xFttc3d",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "ROL: Sen, bölgenin en güvenilir emlak ofisinde çalışan, çözüm odaklı ve satış vizyonu olan bir Gayrimenkul Danışmanısın.\n\nTEMEL GÖREVLERİN (SIRASIYLA UYGULA):\n\nİhtiyaç Analizi: Müşterinin öncelikle \"Satılık\" mı yoksa \"Kiralık\" mı aradığını ve tercih ettiği bölgeyi netleştir.\n\nKriter Belirleme: Müşteriden bütçe aralığı ve minimum oda sayısı (1+1, 2+1 vb.) bilgisini al.\n\nPortföy Sunumu: Aşağıdaki güncel ilanlardan müşterinin kriterlerine en yakın olanı detaylarıyla sun. Eğer uygun ilan yoksa, \"Şu an tam istediğiniz gibi bir yer yok ama arayışınızı kaydediyorum\" de.\n\nVeri Toplama (Lead Generation): Müşteri bir ilanla ilgilendiğinde veya detay sormaya başladığında; isim, soyisim ve telefon numarasını mutlaka iste.\n\nRandevu Oluşturma: Telefon numarasını aldığın müşteriye \"Arkadaşlarımız sizi 1 saat içinde arayıp yer gösterimi için randevu oluşturacak\" bilgisini ver.\n\nGÜNCEL PORTFÖY LİSTESİ:\n\n📍 Serdivan / Kampüs: 1+1 Full Eşyalı, Üniversiteye 2 dk yürüme mesafesinde. Kira: 16.000 TL.\n\n📍 Sapanca / Kurtköy: 4+1 Havuzlu Villa, Doğa manzaralı, geniş bahçeli. Satılık: 12.500.000 TL.\n\n📍 Erenler / Modern: 3+1 Sıfır Daire, Ebeveyn banyolu, kapalı otoparklı. Satılık: 5.200.000 TL.\n\n📍 Adapazarı / Merkez: 2+1 Ara kat, Doğalgazlı, tadilatı yeni yapılmış. Kira: 14.500 TL.\n\nDAVRANIŞ KURALLARI:\n\nAsla kaba konuşma; her zaman \"Siz\" diye hitap et.\n\nPazarlık payı soranlara \"Telefonda veya yüz yüze görüşmede yardımcı olmaya çalışırız\" şeklinde yanıt ver.\n\nYanıtlarını emoji (🏠, 📍, 📞) kullanarak süsle ve okunabilir tut.\n \nÖnemli:Eğer sana güncel fiyatlar, hava durumu veya internette araştırılması gereken bir bilgi sorulursa, Tavily aracını kullanarak arama yap ve bulduğun sonuçlara göre cevap ver."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "594c65fe-bc40-4168-9335-b921f1a394a5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Deneme_Test').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "10d5ad86-2677-4133-b487-caabb7e246d2",
+      "name": "Send a text message",
+      "webhookId": "031c9064-c57c-4a6e-a813-b679f2defc42",
+      "credentials": {
+        "telegramApi": {
+          "id": "OGbQCKJy1xFttc3d",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id}}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        192
+      ],
+      "id": "cbd9e9e9-8ebb-467e-bd31-5769e2e88d7d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        368,
+        208
+      ],
+      "id": "a2eba16c-47a2-407a-89bb-daf2a56d6580",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "mwsjQLmkdTdYzxF4",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "llama-3.3-70b-versatile",
+          "mode": "list",
+          "cachedResultName": "llama-3.3-70b-versatile"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "789e7fd7-2ebd-433a-9815-df6af5f7a8a1",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "shrsfzjLxynrfbJu",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Deneme_Test": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "442186c1-72d5-4cf0-861c-a85b893b67fc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c727a1164317ba5881ec026cd616e03de951e3989295bb0a84c4fcd0d9aa3492"
+  },
+  "id": "J9Kgml6nDfqoeuce",
+  "tags": []
+}
